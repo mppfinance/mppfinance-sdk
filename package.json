@@ -1,0 +1,52 @@
+{
+  "name": "@mppfinance/sdk",
+  "version": "0.1.4",
+  "description": "Virtual Visa cards for AI agents — powered by Machine Payments Protocol",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "mppfinance": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --watch",
+    "test": "vitest run",
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mpp",
+    "ai-agent",
+    "virtual-card",
+    "visa",
+    "solana",
+    "payments",
+    "machine-payments-protocol",
+    "mcp",
+    "claude",
+    "openai"
+  ],
+  "author": "MPPFinance <dev@mppfinance.xyz>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nullprotocolagent/mppfinance-sdk.git"
+  },
+  "homepage": "https://v0-mppf-inance-landing-page.vercel.app",
+  "dependencies": {
+    "eventemitter3": "^5.0.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0"
+  }
+}
