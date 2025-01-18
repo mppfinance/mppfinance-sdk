@@ -45,3 +45,4 @@ export interface CardEvent {
 }
 
 export type EventHandler = (event: CardEvent) => void
+// v2 - Sat Jan 18 23:47:48 MSK 2025
