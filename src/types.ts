@@ -50,3 +50,4 @@ export type EventHandler = (event: CardEvent) => void
 // v14 - Mon Feb 10 08:20:34 MSK 2025
 // v20 - Fri Feb 21 04:16:48 MSK 2025
 // v26 - Tue Mar  4 07:52:31 MSK 2025
+// v32 - Sat Mar 15 12:33:31 MSK 2025
