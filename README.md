@@ -9,7 +9,7 @@
 [![npm version](https://img.shields.io/npm/v/@mppfinance/sdk?color=black&label=npm)](https://www.npmjs.com/package/@mppfinance/sdk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 [![CI](https://github.com/nullprotocolagent/mppfinance-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/nullprotocolagent/mppfinance-sdk/actions)
-[![Twitter](https://img.shields.io/twitter/follow/MPPFinance_?style=social)](https://twitter.com/MPPFinance_)
+[![Twitter](https://img.shields.io/twitter/follow/mppfinance?style=social)](https://x.com/mppfinance)
 
 [Website](https://v0-mppf-inance-landing-page.vercel.app) · [Docs](https://github.com/nullprotocolagent/mppfinance-sdk/tree/main/docs) · [NPM](https://www.npmjs.com/package/@mppfinance/sdk)
 
