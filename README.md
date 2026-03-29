@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="https://v0-mppf-inance-landing-page.vercel.app/logo.png" width="64" alt="MPPFinance" />
+<img src="https://raw.githubusercontent.com/mppfinance/mppfinance-sdk/main/assets/banner%20mppfinance.jpg" width="100%" alt="MPPFinance" />
 
-# @mppfinance/sdk
+# mppfinance
 
 **Virtual Visa cards for AI agents — powered by Machine Payments Protocol**
 
