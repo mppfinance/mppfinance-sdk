@@ -22,7 +22,7 @@
 MPPFinance bridges the **Machine Payments Protocol** to the real world. Your AI agent pays via MPP — gets a virtual Visa card — spends anywhere online. No humans in the loop.
 
 ```ts
-import { MPPFinance } from '@mppfinance/sdk'
+import { MPPFinance } from 'mppfinance'
 
 const card = await MPPFinance.issue({
   agentId: 'agent-7x2k',
@@ -57,11 +57,11 @@ console.log(card.number) // "4111 •••• •••• 9821"
 ## Installation
 
 ```bash
-npm install @mppfinance/sdk
+npm install mppfinance
 # or
-pnpm add @mppfinance/sdk
+pnpm add mppfinance
 # or
-yarn add @mppfinance/sdk
+yarn add mppfinance
 ```
 
 ---
@@ -71,7 +71,7 @@ yarn add @mppfinance/sdk
 ### 1. Initialize
 
 ```ts
-import { MPPFinance } from '@mppfinance/sdk'
+import { MPPFinance } from 'mppfinance'
 
 const client = new MPPFinance({
   agentId: 'your-agent-id',
@@ -138,7 +138,7 @@ MPPFinance ships with an MCP tool for direct agent integration:
   "mcpServers": {
     "mppfinance": {
       "command": "npx",
-      "args": ["-y", "@mppfinance/sdk", "--mcp"],
+      "args": ["-y", "mppfinance", "--mcp"],
       "env": {
         "MPPFINANCE_AGENT_ID": "your-agent-id",
         "MPPFINANCE_NETWORK": "solana"

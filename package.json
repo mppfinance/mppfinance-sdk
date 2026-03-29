@@ -1,5 +1,5 @@
 {
-  "name": "@mppfinance/sdk",
+  "name": "mppfinance",
   "version": "0.1.4",
   "description": "Virtual Visa cards for AI agents — powered by Machine Payments Protocol",
   "main": "dist/index.js",
