@@ -4,6 +4,8 @@ export interface MPPFinanceConfig {
   testnet?: boolean
   webhookUrl?: string
   apiKey?: string
+  /** Called before every charge when requireApproval is true on the card */
+  onApprovalRequired?: (request: ApprovalRequest) => Promise<boolean>
 }
 
 export interface SpendingRules {
@@ -12,6 +14,22 @@ export interface SpendingRules {
   expiresIn?: number
   maxPerTx?: number
   maxPerDay?: number
+  /** Require explicit approval before every charge */
+  requireApproval?: boolean
+}
+
+export interface ApprovalRequest {
+  cardId: string
+  amount: number
+  currency: string
+  merchant?: string
+  agentId: string
+  timestamp: Date
+}
+
+export interface ApprovalResult {
+  approved: boolean
+  reason?: string
 }
 
 export interface CardOptions {
@@ -37,7 +55,7 @@ export interface CardResult {
 }
 
 export interface CardEvent {
-  type: 'charge' | 'expired' | 'revoked' | 'issued'
+  type: 'charge' | 'charge.approved' | 'charge.denied' | 'expired' | 'revoked' | 'issued'
   cardId: string
   amount?: number
   merchant?: string
@@ -45,10 +63,3 @@ export interface CardEvent {
 }
 
 export type EventHandler = (event: CardEvent) => void
-// v2 - Sat Jan 18 23:47:48 MSK 2025
-// v8 - Thu Jan 30 05:35:32 MSK 2025
-// v14 - Mon Feb 10 08:20:34 MSK 2025
-// v20 - Fri Feb 21 04:16:48 MSK 2025
-// v26 - Tue Mar  4 07:52:31 MSK 2025
-// v32 - Sat Mar 15 12:33:31 MSK 2025
-// v38 - Wed Mar 26 13:19:07 MSK 2025

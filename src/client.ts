@@ -1,21 +1,17 @@
-import EventEmitter from 'eventemitter3'
-import type { MPPFinanceConfig, CardOptions, CardResult, EventHandler } from './types'
+import type { MPPFinanceConfig, CardOptions, CardResult, ApprovalRequest, ApprovalResult } from './types'
 
-export class MPPFinance extends EventEmitter {
+type EventHandler = (event: any) => void
+
+export class MPPFinance {
   private config: MPPFinanceConfig
-  private baseUrl: string
+  private handlers: Record<string, EventHandler[]> = {}
+  private cards: Map<string, CardResult> = new Map()
+  private dailySpend: Map<string, number> = new Map()
 
   constructor(config: MPPFinanceConfig) {
-    super()
     this.config = config
-    this.baseUrl = config.testnet
-      ? 'https://api-testnet.mppfinance.xyz'
-      : 'https://api.mppfinance.xyz'
   }
 
-  /**
-   * Issue a new virtual Visa card with spending rules
-   */
   async issue(options: CardOptions): Promise<CardResult> {
     const card: CardResult = {
       id: `card_${Math.random().toString(36).slice(2, 10)}`,
@@ -34,55 +30,133 @@ export class MPPFinance extends EventEmitter {
       rules: options.rules ?? {},
     }
 
-    this.emit('issued', {
-      type: 'issued',
-      cardId: card.id,
-      timestamp: new Date(),
-    })
-
+    this.cards.set(card.id, card)
+    this._emit('issued', { type: 'issued', cardId: card.id, timestamp: new Date() })
     return card
   }
 
   /**
-   * List all active cards for this agent
+   * Simulate a charge on a card.
+   * If the card has requireApproval: true, the onApprovalRequired callback is called first.
+   * Throws if denied, over limit, wrong merchant, or card expired/revoked.
    */
+  async charge(cardId: string, amount: number, merchant?: string): Promise<ApprovalResult> {
+    const card = this.cards.get(cardId)
+    if (!card) throw new Error(`Card ${cardId} not found`)
+    if (card.status !== 'active') throw new Error(`Card ${cardId} is ${card.status}`)
+
+    // Check expiry
+    if (card.expiresAt && card.expiresAt < new Date()) {
+      card.status = 'expired'
+      this._emit('expired', { type: 'expired', cardId, timestamp: new Date() })
+      throw new Error(`Card ${cardId} has expired`)
+    }
+
+    // Check merchant whitelist
+    if (card.rules.merchant && merchant && !merchant.includes(card.rules.merchant)) {
+      const result: ApprovalResult = { approved: false, reason: `Merchant ${merchant} not allowed. Only ${card.rules.merchant}` }
+      this._emit('charge.denied', { type: 'charge.denied', cardId, amount, merchant, timestamp: new Date() })
+      return result
+    }
+
+    // Check per-tx limit
+    if (card.rules.maxPerTx && amount > card.rules.maxPerTx) {
+      const result: ApprovalResult = {
+        approved: false,
+        reason: `Amount $${(amount / 100).toFixed(2)} exceeds per-tx limit $${(card.rules.maxPerTx / 100).toFixed(2)}`,
+      }
+      this._emit('charge.denied', { type: 'charge.denied', cardId, amount, merchant, timestamp: new Date() })
+      return result
+    }
+
+    // Check daily spend limit
+    if (card.rules.maxPerDay) {
+      const today = new Date().toDateString()
+      const key = `${cardId}:${today}`
+      const todaySpend = this.dailySpend.get(key) ?? 0
+      if (todaySpend + amount > card.rules.maxPerDay) {
+        const result: ApprovalResult = {
+          approved: false,
+          reason: `Daily limit reached. Spent $${(todaySpend / 100).toFixed(2)} of $${(card.rules.maxPerDay / 100).toFixed(2)}`,
+        }
+        this._emit('charge.denied', { type: 'charge.denied', cardId, amount, merchant, timestamp: new Date() })
+        return result
+      }
+    }
+
+    // Check total card balance
+    if (card.spent + amount > card.amount) {
+      const result: ApprovalResult = {
+        approved: false,
+        reason: `Insufficient balance. Available: $${((card.amount - card.spent) / 100).toFixed(2)}`,
+      }
+      this._emit('charge.denied', { type: 'charge.denied', cardId, amount, merchant, timestamp: new Date() })
+      return result
+    }
+
+    // Approval gate — ask human/system before proceeding
+    if (card.rules.requireApproval) {
+      const request: ApprovalRequest = {
+        cardId,
+        amount,
+        currency: card.currency,
+        merchant,
+        agentId: this.config.agentId,
+        timestamp: new Date(),
+      }
+
+      const approved = this.config.onApprovalRequired
+        ? await this.config.onApprovalRequired(request)
+        : false // default: deny if no handler registered
+
+      if (!approved) {
+        const result: ApprovalResult = { approved: false, reason: 'Approval denied or no approval handler registered' }
+        this._emit('charge.denied', { type: 'charge.denied', cardId, amount, merchant, timestamp: new Date() })
+        return result
+      }
+    }
+
+    // Execute charge
+    card.spent += amount
+    const today = new Date().toDateString()
+    const key = `${cardId}:${today}`
+    this.dailySpend.set(key, (this.dailySpend.get(key) ?? 0) + amount)
+
+    if (card.rules.singleUse) {
+      card.status = 'used'
+    }
+
+    this._emit('charge', { type: 'charge', cardId, amount, merchant, timestamp: new Date() })
+    this._emit('charge.approved', { type: 'charge.approved', cardId, amount, merchant, timestamp: new Date() })
+
+    return { approved: true }
+  }
+
   async list(): Promise<CardResult[]> {
-    return []
+    return Array.from(this.cards.values())
   }
 
-  /**
-   * Revoke a card by ID
-   */
   async revoke(cardId: string): Promise<void> {
-    this.emit('revoked', {
-      type: 'revoked',
-      cardId,
-      timestamp: new Date(),
-    })
+    const card = this.cards.get(cardId)
+    if (card) card.status = 'revoked'
+    this._emit('revoked', { type: 'revoked', cardId, timestamp: new Date() })
   }
 
-  /**
-   * Get agent wallet balance
-   */
   async getBalance(): Promise<{ sol: number; usd: number }> {
     return { sol: 0, usd: 0 }
   }
 
-  /**
-   * Get transaction history
-   */
-  async getHistory(limit = 20) {
+  async getHistory(limit = 20): Promise<any[]> {
     return []
   }
 
   on(event: string, handler: EventHandler): this {
-    return super.on(event, handler)
+    if (!this.handlers[event]) this.handlers[event] = []
+    this.handlers[event].push(handler)
+    return this
+  }
+
+  private _emit(event: string, data: any): void {
+    ;(this.handlers[event] ?? []).forEach(h => h(data))
   }
 }
-// v1 - Fri Jan 17 00:19:22 MSK 2025
-// v7 - Tue Jan 28 03:00:31 MSK 2025
-// v13 - Sat Feb  8 09:57:34 MSK 2025
-// v19 - Wed Feb 19 12:01:23 MSK 2025
-// v25 - Sun Mar  2 08:38:16 MSK 2025
-// v31 - Thu Mar 13 12:22:04 MSK 2025
-// v37 - Mon Mar 24 13:39:55 MSK 2025

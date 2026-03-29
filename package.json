@@ -1,6 +1,6 @@
 {
   "name": "mppfinance",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Virtual Visa cards for AI agents — powered by Machine Payments Protocol",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
