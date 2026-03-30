@@ -6,9 +6,9 @@
 
 **Virtual Visa cards for AI agents — powered by Machine Payments Protocol**
 
-[![npm version](https://img.shields.io/npm/v/@mppfinance/sdk?color=black&label=npm)](https://www.npmjs.com/package/@mppfinance/sdk)
+[![npm version](https://img.shields.io/npm/v/mppfinance?color=black&label=npm)](https://www.npmjs.com/package/mppfinance)
 [![License: MIT](https://img.shields.io/badge/license-MIT-black)](LICENSE)
-[![CI](https://github.com/nullprotocolagent/mppfinance-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/nullprotocolagent/mppfinance-sdk/actions)
+[![CI](https://github.com/mppfinance/mppfinance-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/mppfinance/mppfinance-sdk/actions)
 [![Twitter](https://img.shields.io/twitter/follow/mppfinance?style=social)](https://x.com/mppfinance)
 
 [Website](https://mppfinance.xyz) · [Docs](https://github.com/mppfinance/mppfinance-sdk/tree/main/docs) · [NPM](https://www.npmjs.com/package/mppfinance)
