@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/mppfinance/mppfinance-sdk/main/assets/banner%20mppfinance.jpg" width="100%" alt="MPPFinance" />
+<img src="https://raw.githubusercontent.com/mppfinance/mppfinance-sdk/main/assets/banner%20mpp.jpg" width="100%" alt="MPPFinance" />
 
 # mppfinance
 
